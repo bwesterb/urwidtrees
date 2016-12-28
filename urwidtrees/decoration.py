@@ -1,14 +1,12 @@
 # Copyright (C) 2013  Patrick Totzke <patricktotzke@gmail.com>
 # This file is released under the GNU GPL, version 3 or a later revision.
-from .tree import Tree, SimpleTree
 import urwid
-import logging
 
-NO_SPACE_MSG = 'too little space for requested decoration'
+from .tree import Tree, SimpleTree
 
 
-class TreeDecorationError(Exception):
-    pass
+class NoSpaceError(Exception):
+    """too little space for requested decoration"""
 
 
 class DecoratedTree(Tree):
@@ -216,7 +214,6 @@ class IndentedTree(DecoratedTree):
         DecoratedTree.__init__(self, tree)
 
     def decorate(self, pos, widget, is_first=True):
-        line = None
         indent = self._tree.depth(pos) * self._indent
         cols = [(indent, urwid.SolidFill(' ')), widget]
         # construct a Columns, defining all spacer as Box widgets
@@ -248,7 +245,7 @@ class CollapsibleIndentedTree(CollapseIconMixin, IndentedTree):
         builds a list element for given position in the tree.
         It consists of the original widget taken from the Tree and some
         decoration columns depending on the existence of parent and sibling
-        positions. The result is a urwid.Culumns widget.
+        positions. The result is a urwid.Columns widget.
         """
         void = urwid.SolidFill(' ')
         line = None
@@ -267,7 +264,7 @@ class CollapsibleIndentedTree(CollapseIconMixin, IndentedTree):
 
         # stop if indent is too small for this decoration
         if firstindent_width > available_space:
-            raise TreeDecorationError(NO_SPACE_MSG)
+            raise NoSpaceError()
 
         # add icon only for non-leafs
         is_leaf = self._tree.is_leaf(pos)
@@ -400,7 +397,7 @@ class ArrowTree(IndentedTree):
             if connector is not None:
                 width = connector.pack()[0]
                 if width > available_width:
-                    raise TreeDecorationError(NO_SPACE_MSG)
+                    raise NoSpaceError()
                 available_width -= width
                 if self._tree.next_sibling_position(pos) is not None:
                     barw = urwid.SolidFill(self._arrow_vbar_char)
@@ -416,7 +413,7 @@ class ArrowTree(IndentedTree):
             awidth, at = self._construct_arrow_tip(pos)
             if at is not None:
                 if awidth > available_width:
-                    raise TreeDecorationError(NO_SPACE_MSG)
+                    raise NoSpaceError()
                 available_width -= awidth
                 at_spacer = urwid.Pile([('pack', at), void])
                 cols.append((awidth, at_spacer))
@@ -435,7 +432,7 @@ class ArrowTree(IndentedTree):
         builds a list element for given position in the tree.
         It consists of the original widget taken from the Tree and some
         decoration columns depending on the existence of parent and sibling
-        positions. The result is a urwid.Culumns widget.
+        positions. The result is a urwid.Columns widget.
         """
         line = None
         if pos is not None:

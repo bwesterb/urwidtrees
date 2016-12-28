@@ -1,16 +1,23 @@
 #!/usr/bin/env python
+from setuptools import setup
 
-from distutils.core import setup
-import urwidtrees.version as v
+# this loads the version string into __version__
+with open('urwidtrees/version.py') as f:
+    exec(f.read())
 
-
-setup(name='urwidtrees',
-      version=v.__version__,
-      description=v.__description__,
-      author=v.__author__,
-      author_email=v.__author_email__,
-      url=v.__url__,
-      license=v.__copyright__,
-      packages=['urwidtrees'],
-      requires=['urwid (>=1.1.0)'],
-     )
+setup(
+    name='urwidtrees',
+    version=__version__,
+    description="Tree widgets for urwid",
+    author="Patrick Totzke",
+    author_email="patricktotzke@gmail.com",
+    url="https://github.com/pazz/urwidtrees",
+    license="Licensed under the GNU GPL v3+.",
+    packages=['urwidtrees'],
+    install_requires=['urwid>=1.1.0', 'mock'],
+    extras_require={
+        'docs': [
+            'mock',
+        ],
+    },
+)

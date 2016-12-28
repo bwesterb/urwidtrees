@@ -15,44 +15,40 @@
 import sys
 import os
 
+# If extensions (or modules to document with autodoc) are in another directory,
+# add these directories to sys.path here. If the directory is relative to the
+# documentation root, use os.path.abspath to make it absolute, like shown here.
+sys.path.insert(0, os.path.abspath('../..'))
+
 
 ###############################
 # readthedocs.org hack,
 # needed to use autodocs on their build-servers:
 # http://readthedocs.org/docs/read-the-docs/en/latest/faq.html?highlight=autodocs#where-do-i-need-to-put-my-docs-for-rtd-to-find-it
+try:
+    from unittest.mock import MagicMock
+except ImportError:
+    from mock import Mock as MagicMock
 
-class Mock(object):
-    def __init__(self, *args, **kwargs):
-        pass
 
-    def __call__(self, *args, **kwargs):
-        return Mock()
-
+class Mock(MagicMock):
     @classmethod
-    def __getattr__(self, name):
-        return Mock() if name not in ('__file__', '__path__') else '/dev/null'
+    def __getattr__(cls, name):
+            return MagicMock()
+
 
 class MockModule(object):
     @classmethod
-    def __getattr__(self, name):
+    def __getattr__(cls, name):
         return Mock if name not in ('__file__', '__path__') else '/dev/null'
 
-MOCK_MODULES = [ 'urwid', ]
-MOCK_DIRTY = []
+MOCK_MODULES = ['urwid']
 
-for mod_name in MOCK_MODULES:
-    sys.modules[mod_name] = MockModule()
-for mod_name in MOCK_DIRTY:
-    sys.modules[mod_name] = Mock()
+#for mod_name in MOCK_MODULES:
+#    sys.modules[mod_name] = MockModule()
+sys.modules.update((mod_name, MockModule()) for mod_name in MOCK_MODULES)
 
 ##################################
-
-# If extensions (or modules to document with autodoc) are in another directory,
-# add these directories to sys.path here. If the directory is relative to the
-# documentation root, use os.path.abspath to make it absolute, like shown here.
-#sys.path.insert(0, os.path.abspath('.'))
-sys.path.insert(0, os.path.abspath(os.path.join('..','..')))
-from urwidtrees import __version__,__author__
 
 # -- General configuration ------------------------------------------------
 
@@ -84,12 +80,15 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'urwidtrees'
-copyright = u'2015, Patrick Totzke'
+copyright = u'Patrick Totzke'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
 # built documents.
 #
+# this loads the version string into __version__
+with open('../../urwidtrees/version.py') as f:
+    exec(f.read())
 # The short X.Y version.
 version = __version__
 # The full version, including alpha/beta/rc tags.
@@ -167,7 +166,7 @@ html_theme = 'default'
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+#html_static_path = ['_static']
 
 # Add any extra paths that contain custom files (such as robots.txt or
 # .htaccess) here, relative to this directory. These files are copied
@@ -222,14 +221,14 @@ htmlhelp_basename = 'urwidtreesdoc'
 # -- Options for LaTeX output ---------------------------------------------
 
 latex_elements = {
-# The paper size ('letterpaper' or 'a4paper').
-#'papersize': 'letterpaper',
+    # The paper size ('letterpaper' or 'a4paper').
+    #'papersize': 'letterpaper',
 
-# The font size ('10pt', '11pt' or '12pt').
-#'pointsize': '10pt',
+    # The font size ('10pt', '11pt' or '12pt').
+    #'pointsize': '10pt',
 
-# Additional stuff for the LaTeX preamble.
-#'preamble': '',
+    # Additional stuff for the LaTeX preamble.
+    #'preamble': '',
 }
 
 # Grouping the document tree into LaTeX files. List of tuples
